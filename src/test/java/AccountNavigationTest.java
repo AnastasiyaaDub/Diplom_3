@@ -13,7 +13,6 @@ import pages.MainPage;
 import pages.ProfilePage;
 import java.time.Duration;
 
-import static com.codeborne.selenide.Condition.cssClass;
 import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.WebDriverConditions.urlContaining;
 
@@ -23,32 +22,17 @@ public class AccountNavigationTest extends TestsBase {
     private MainPage mainPage;
     private ProfilePage profilePage;
 
+
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         //Создаем пользователя через API
         testUser = UserApi.createUserForUITest();
+        open(BaseElements.BASE_URL);
 
         LoginPage loginPage = new LoginPage();
         mainPage = new MainPage();
         profilePage = new ProfilePage();
 
-        open(BaseElements.BASE_URL);
-        if ("yandex".equals(System.getProperty("browser", "chrome"))) {
-            try {
-                // Пытаемся закрыть всплывашки
-                executeJavaScript(
-                        "document.querySelectorAll('[role=dialog], .modal, .popup, .alert, .overlay')" +
-                                ".forEach(el => el.style.display = 'none');"
-                );
-
-                // Ждем небольшое время без sleep
-                $("body").shouldNotHave(cssClass("modal-open"), Duration.ofSeconds(2));
-
-            } catch (Exception e) {
-                // Логируем но не падаем
-                System.out.println("Не удалось закрыть popup: " + e.getMessage());
-            }
-        }
 
         mainPage.goToProfile();
         loginPage.login(testUser.getEmail(), testUser.getPassword());
@@ -56,12 +40,6 @@ public class AccountNavigationTest extends TestsBase {
         webdriver().shouldHave(urlContaining("/"));
     }
 
-    @AfterEach
-    void tearDown() {
-        if (testUser != null && testUser.hasAccessToken()) {
-            UserApi.deleteUser(testUser);
-        }
-    }
 
     @ParameterizedTest
     @ValueSource(strings = {"chrome", "yandex"})
@@ -126,5 +104,12 @@ public class AccountNavigationTest extends TestsBase {
 
         //Проверяем выход
         webdriver().shouldHave(urlContaining("login"), Duration.ofSeconds(5));
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (testUser != null && testUser.hasAccessToken()) {
+            UserApi.deleteUser(testUser);
+        }
     }
 }

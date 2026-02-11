@@ -1,8 +1,7 @@
 import config.BaseElements;
 import config.TestsBase;
-import data.UserApi;
 import data.UserUI;
-import io.qameta.allure.Feature;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,43 +11,29 @@ import org.openqa.selenium.Keys;
 import pages.RegistrationPage;
 import java.time.Duration;
 import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selectors.byClassName;
 import static com.codeborne.selenide.Selectors.withText;
 import static com.codeborne.selenide.Selenide.*;
 import static config.BaseElements.REGISTER_UI;
+import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-@Feature("Регистрация пользователя")
 public class RegistrationTests extends TestsBase {
     private UserUI createdUser;
 
+
     @BeforeEach
-    void setUp() {
-        // Только открываем базовую страницу
-        open(BaseElements.BASE_URL);
-        if ("yandex".equals(System.getProperty("browser", "chrome"))) {
-            try {
-                // Пытаемся закрыть всплывашки
-                executeJavaScript(
-                        "document.querySelectorAll('[role=dialog], .modal, .popup, .alert, .overlay')" +
-                                ".forEach(el => el.style.display = 'none');"
-                );
+    public void setUp() {
+        super.setUp();
+        open(REGISTER_UI);
 
-                // Ждем небольшое время без sleep
-                $("body").shouldNotHave(cssClass("modal-open"), Duration.ofSeconds(2));
-
-            } catch (Exception e) {
-                // Логируем но не падаем
-                System.out.println("Не удалось закрыть popup: " + e.getMessage());
-            }
-        }
         createdUser = null;
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"chrome", "yandex"})
     @DisplayName("Успешная регистрация нового пользователя")
-
     void registrationTest(String browser) {
         // Настраиваем браузер перед тестом
         setupBrowser(browser);
@@ -56,8 +41,6 @@ public class RegistrationTests extends TestsBase {
 
         createdUser = UserUI.generateRandom();
 
-        open(REGISTER_UI);
-        $("h1, h2, h3").shouldBe(visible);
 
         RegistrationPage registrationPage = new RegistrationPage();
         registrationPage.register(
@@ -77,7 +60,6 @@ public class RegistrationTests extends TestsBase {
     @ParameterizedTest
     @ValueSource(strings = {"chrome", "yandex"})
     @DisplayName("Успешная регистрация нового пользователя с минимальным паролем - 6 символов")
-
     void registrationPasswordMinTest(String browser) {
         // Настраиваем браузер перед тестом
         setupBrowser(browser);
@@ -86,8 +68,6 @@ public class RegistrationTests extends TestsBase {
         createdUser = UserUI.generateRandom();
         createdUser.setPassword("Qwerty");
 
-        open(REGISTER_UI);
-        $("h1, h2, h3").shouldBe(visible);
 
         RegistrationPage registrationPage = new RegistrationPage();
         registrationPage.register(
@@ -108,16 +88,13 @@ public class RegistrationTests extends TestsBase {
     @ParameterizedTest
     @ValueSource(strings = {"chrome", "yandex"})
     @DisplayName("Ошибка регистрации пользователя при вводе пароля менее 5 символов")
-
-    void RegisterWithAFiveCharacterPassword (String browser) {
+    void RegisterWithAFiveCharacterPassword(String browser) {
         // Настраиваем браузер перед тестом
         setupBrowser(browser);
 
         createdUser = UserUI.generateRandom();
         createdUser.setPassword("12345");
 
-        open(REGISTER_UI);
-        $("h1, h2, h3").shouldBe(visible);
 
         RegistrationPage registrationPage = new RegistrationPage();
         registrationPage.register(
@@ -126,6 +103,7 @@ public class RegistrationTests extends TestsBase {
                 createdUser.getPassword()
         );
 
+        $(byClassName("input__error")).shouldBe(visible, Duration.ofSeconds(5));
 
         String currentUrl = webdriver().driver().url();
         assertTrue(currentUrl.contains("register"),
@@ -138,14 +116,34 @@ public class RegistrationTests extends TestsBase {
     @AfterEach
     void tearDown() {
         // Удаляем пользователя, если он был создан
-        if (createdUser != null) {
+        if (createdUser != null && createdUser.getPassword() != null
+                && createdUser.getPassword().length() >= 6) {
             try {
-                // Пытаемся получить токен через логин и удалить
-                UserApi.deleteUser(createdUser);
+                String token = given()
+                        .contentType(ContentType.JSON)
+                        .body(createdUser)  // если UserUI сериализуется корректно
+                        .when()
+                        .post(BaseElements.LOGIN)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .path("accessToken");
+
+                // Если есть токен - удаляем
+                if (token != null) {
+                    given()
+                            .header("Authorization", token)
+                            .when()
+                            .delete(BaseElements.USER)
+                            .then()
+                            .statusCode(202);
+                    System.out.println("Удален пользователь: " + createdUser.getEmail());
+                }
             } catch (Exception e) {
                 System.err.println("Не удалось удалить пользователя: " + e.getMessage());
             }
+
+
         }
     }
-
 }

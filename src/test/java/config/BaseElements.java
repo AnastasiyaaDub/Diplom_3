@@ -13,4 +13,5 @@ public class BaseElements {
     //Для api методов
     public static final String REGISTER = BASE_URL + "/api/auth/register";
     public static final String USER = BASE_URL + "/api/auth/user";
+    public static final String LOGIN = BASE_URL + "/api/auth/login";
 }

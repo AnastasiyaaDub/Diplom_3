@@ -6,10 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import pages.MainPage;
 
-import java.time.Duration;
-
-import static com.codeborne.selenide.Condition.cssClass;
-import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -17,27 +13,12 @@ public class ConstructorTest extends TestsBase {
 
     private MainPage mainPage;
 
+
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         mainPage = new MainPage();
         open(BaseElements.BASE_URL);
-        if ("yandex".equals(System.getProperty("browser", "chrome"))) {
-            try {
-                // Пытаемся закрыть всплывашки
-                executeJavaScript(
-                        "document.querySelectorAll('[role=dialog], .modal, .popup, .alert, .overlay')" +
-                                ".forEach(el => el.style.display = 'none');"
-                );
 
-                // Ждем небольшое время без sleep
-                $("body").shouldNotHave(cssClass("modal-open"), Duration.ofSeconds(2));
-
-            } catch (Exception e) {
-                // Логируем но не падаем
-                System.out.println("Не удалось закрыть popup: " + e.getMessage());
-            }
-        }
-        $x("//h1[contains(text(),'Соберите бургер')]").shouldBe(visible);
     }
 
     @ParameterizedTest

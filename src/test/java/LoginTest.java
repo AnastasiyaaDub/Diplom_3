@@ -9,10 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.openqa.selenium.Keys;
 import pages.*;
-
 import java.time.Duration;
-
-import static com.codeborne.selenide.Condition.cssClass;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.WebDriverConditions.urlContaining;
@@ -24,7 +21,7 @@ public class LoginTest extends TestsBase {
     private MainPage mainPage;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         // Предусловие: создаем пользователя через API
         testUser = UserApi.createUserForUITest();
 
@@ -33,31 +30,9 @@ public class LoginTest extends TestsBase {
 
         // Открываем браузер
         open(BaseElements.BASE_URL);
-        if ("yandex".equals(System.getProperty("browser", "chrome"))) {
-            try {
-                // Пытаемся закрыть всплывашки
-                executeJavaScript(
-                        "document.querySelectorAll('[role=dialog], .modal, .popup, .alert, .overlay')" +
-                                ".forEach(el => el.style.display = 'none');"
-                );
 
-                // Ждем небольшое время без sleep
-                $("body").shouldNotHave(cssClass("modal-open"), Duration.ofSeconds(2));
-
-            } catch (Exception e) {
-                // Логируем но не падаем
-                System.out.println("Не удалось закрыть popup: " + e.getMessage());
-            }
-        }
     }
 
-    @AfterEach
-    void tearDown() {
-        // Постусловие: удаляем пользователя
-        if (testUser != null && testUser.hasAccessToken()) {
-            UserApi.deleteUser(testUser);
-        }
-    }
 
     @ParameterizedTest
     @ValueSource(strings = {"chrome", "yandex"})
@@ -150,4 +125,11 @@ public class LoginTest extends TestsBase {
         mainPage.goToProfile();
     }
 
+    @AfterEach
+    void tearDown() {
+        // Постусловие: удаляем пользователя
+        if (testUser != null && testUser.hasAccessToken()) {
+            UserApi.deleteUser(testUser);
+        }
+    }
 }
