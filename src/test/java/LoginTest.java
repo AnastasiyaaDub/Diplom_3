@@ -1,14 +1,12 @@
 import config.BaseElements;
 import config.TestsBase;
 import data.UserApi;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import pages.*;
 import java.time.Duration;
-import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.WebDriverConditions.urlContaining;
 
@@ -40,7 +38,7 @@ public class LoginTest extends TestsBase {
         mainPage.clickloginButtonMain();
 
         //Ожидаем загрузки страницы логина
-        $("h2").shouldHave(text("Вход"));
+        loginPage.checkPageLoaded();
 
         //Заполняем форму логина
         loginPage.login(createdUser.getEmail(), createdUser.getPassword());
@@ -61,7 +59,7 @@ public class LoginTest extends TestsBase {
 
         //Проверяем редирект на страницу логина
         webdriver().shouldHave(urlContaining("login"), Duration.ofSeconds(5));
-        $("h2").shouldHave(text("Вход"));
+        loginPage.checkPageLoaded();
 
         //Логинимся через LoginPage
         loginPage.login(createdUser.getEmail(), createdUser.getPassword());

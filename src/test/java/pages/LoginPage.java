@@ -4,6 +4,7 @@ import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 import java.time.Duration;
 import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selectors.withText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
 
@@ -60,6 +61,10 @@ public class LoginPage {
         setEmail(email);
         setPassword(password);
         clickLoginButton();
+    }
+
+    public void checkPageLoaded() {
+        $(withText("Вход")).shouldBe(visible, Duration.ofSeconds(5));
     }
 
 }

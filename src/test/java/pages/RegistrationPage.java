@@ -1,8 +1,13 @@
 package pages;
 
 import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.ex.ElementNotFound;
 import io.qameta.allure.Step;
 
+import java.time.Duration;
+
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selectors.byClassName;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
 
@@ -61,7 +66,12 @@ public class RegistrationPage {
 
     // Метод проверки видимости ошибки пароля
     public boolean isPasswordErrorDisplayed() {
-        return passwordError.isDisplayed();
+        try {
+            // Локатор теперь спрятан внутри класса страницы
+            return $(byClassName("input__error")).shouldBe(visible, Duration.ofSeconds(3)).isDisplayed();
+        } catch (ElementNotFound e) {
+            return false;
+        }
     }
 
 }

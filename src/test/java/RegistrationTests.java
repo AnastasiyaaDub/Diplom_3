@@ -4,11 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
+import pages.LoginPage;
 import pages.RegistrationPage;
-import java.time.Duration;
-import static com.codeborne.selenide.Condition.*;
-import static com.codeborne.selenide.Selectors.byClassName;
-import static com.codeborne.selenide.Selectors.withText;
 import static com.codeborne.selenide.Selenide.*;
 import static config.BaseElements.REGISTER_UI;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,7 +34,9 @@ public class RegistrationTests extends TestsBase {
                 createdUser.getPassword()
         );
 
-        $(withText("Вход")).shouldBe(visible, Duration.ofSeconds(5));
+        LoginPage loginPage = new LoginPage();
+        loginPage.checkPageLoaded();
+
         actions().sendKeys(Keys.ESCAPE).perform();
         // Проверка
         String currentUrl = webdriver().driver().url();
@@ -60,7 +59,9 @@ public class RegistrationTests extends TestsBase {
                 createdUser.getPassword()
         );
 
-        $(withText("Вход")).shouldBe(visible, Duration.ofSeconds(5));
+        LoginPage loginPage = new LoginPage();
+        loginPage.checkPageLoaded();
+
         actions().sendKeys(Keys.ESCAPE).perform();
         // Проверка
         String currentUrl = webdriver().driver().url();
@@ -70,7 +71,7 @@ public class RegistrationTests extends TestsBase {
 
 
     @Test
-    @DisplayName("Ошибка регистрации пользователя при вводе пароля менее 5 символов")
+    @DisplayName("Ошибка регистрации пользователя при вводе пароля менее 6 символов")
     void RegisterWithAFiveCharacterPassword() {
 
         createdUser = UserUI.generateRandom();
@@ -84,14 +85,13 @@ public class RegistrationTests extends TestsBase {
                 createdUser.getPassword()
         );
 
-        $(byClassName("input__error")).shouldBe(visible, Duration.ofSeconds(5));
+        assertTrue(registrationPage.isPasswordErrorDisplayed(),
+                "Ошибка о некорректном пароле должна отображаться");
 
         String currentUrl = webdriver().driver().url();
         assertTrue(currentUrl.contains("register"),
                 "Ожидалось остаться на странице регистрации при коротком пароле. Текущий URL: " + currentUrl);
 
-        assertTrue(registrationPage.isPasswordErrorDisplayed(),
-                "Ошибка пароля должна отображаться");
     }
 
 }
