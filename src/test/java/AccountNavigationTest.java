@@ -1,8 +1,7 @@
 import config.BaseElements;
 import config.TestsBase;
 import data.UserApi;
-import data.UserUI;
-import org.junit.jupiter.api.AfterEach;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,7 @@ import java.time.Duration;
 
 import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.WebDriverConditions.urlContaining;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AccountNavigationTest extends TestsBase {
 
@@ -65,8 +65,10 @@ public class AccountNavigationTest extends TestsBase {
 
         //Проверяем что вернулись в конструктор
         webdriver().shouldHave(urlContaining("/"), Duration.ofSeconds(5));
-        mainPage.isTabActive("Булки");
-        System.out.println("Текст активного таба: " + mainPage.isTabActive("Булки"));
+
+        assertTrue(mainPage.isTabActive("Булки"));
+
+
     }
 
     @Test
