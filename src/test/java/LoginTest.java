@@ -5,8 +5,7 @@ import data.UserUI;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import pages.*;
 import java.time.Duration;
@@ -33,12 +32,9 @@ public class LoginTest extends TestsBase {
 
     }
 
-
-    @ParameterizedTest
-    @ValueSource(strings = {"chrome", "yandex"})
+    @Test
     @DisplayName("Логин по кнопке 'Войти в аккаунт' на главной")
-    void loginViaMainPageButton(String browser) {
-        setupBrowser(browser);
+    void loginViaMainPageButton() {
 
         //На главной странице нажимаем "Войти в аккаунт"
         mainPage.clickloginButtonMain();
@@ -57,12 +53,9 @@ public class LoginTest extends TestsBase {
         mainPage.goToProfile();
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"chrome", "yandex"})
+    @Test
     @DisplayName("Логин через кнопку 'Личный Кабинет'")
-    void loginViaPersonalAccountButton(String browser) {
-        setupBrowser(browser);
-
+    void loginViaPersonalAccountButton() {
         //Нажимаем "Личный Кабинет"
         mainPage.goToProfile();
 
@@ -78,11 +71,10 @@ public class LoginTest extends TestsBase {
         mainPage.goToProfile();
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"chrome", "yandex"})
+    @Test
     @DisplayName("Логин через страницу регистрации")
-    void loginFromRegistrationPage(String browser) {
-        setupBrowser(browser);
+    void loginFromRegistrationPage() {
+
         RegistrationPage registrationPage = new RegistrationPage();
 
         //Переходим на страницу регистрации
@@ -103,11 +95,10 @@ public class LoginTest extends TestsBase {
         mainPage.goToProfile();
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"chrome", "yandex"})
+    @Test
     @DisplayName("Логин через страницу восстановления пароля")
-    void loginFromPasswordRecoveryPage(String browser) {
-        setupBrowser(browser);
+    void loginFromPasswordRecoveryPage() {
+
         ForgotPasswordPage forgotPasswordPage = new ForgotPasswordPage();
 
         //Переходим на страницу восстановления пароля

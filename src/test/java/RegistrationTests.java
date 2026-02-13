@@ -5,8 +5,7 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import pages.RegistrationPage;
 import java.time.Duration;
@@ -31,16 +30,11 @@ public class RegistrationTests extends TestsBase {
         createdUser = null;
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"chrome", "yandex"})
+    @Test
     @DisplayName("Успешная регистрация нового пользователя")
-    void registrationTest(String browser) {
-        // Настраиваем браузер перед тестом
-        setupBrowser(browser);
-
+    void registrationTest() {
 
         createdUser = UserUI.generateRandom();
-
 
         RegistrationPage registrationPage = new RegistrationPage();
         registrationPage.register(
@@ -57,13 +51,9 @@ public class RegistrationTests extends TestsBase {
                 "Ожидался редирект на страницу логина. Текущий URL: " + currentUrl);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"chrome", "yandex"})
+    @Test
     @DisplayName("Успешная регистрация нового пользователя с минимальным паролем - 6 символов")
-    void registrationPasswordMinTest(String browser) {
-        // Настраиваем браузер перед тестом
-        setupBrowser(browser);
-
+    void registrationPasswordMinTest() {
 
         createdUser = UserUI.generateRandom();
         createdUser.setPassword("Qwerty");
@@ -85,12 +75,9 @@ public class RegistrationTests extends TestsBase {
     }
 
 
-    @ParameterizedTest
-    @ValueSource(strings = {"chrome", "yandex"})
+    @Test
     @DisplayName("Ошибка регистрации пользователя при вводе пароля менее 5 символов")
-    void RegisterWithAFiveCharacterPassword(String browser) {
-        // Настраиваем браузер перед тестом
-        setupBrowser(browser);
+    void RegisterWithAFiveCharacterPassword() {
 
         createdUser = UserUI.generateRandom();
         createdUser.setPassword("12345");

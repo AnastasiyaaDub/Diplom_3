@@ -5,8 +5,7 @@ import data.UserUI;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import pages.LoginPage;
 import pages.MainPage;
@@ -41,12 +40,9 @@ public class AccountNavigationTest extends TestsBase {
     }
 
 
-    @ParameterizedTest
-    @ValueSource(strings = {"chrome", "yandex"})
+    @Test
     @DisplayName("Переход в Личный кабинет после логина")
-    void goToPersonalAccountAfterLogin(String browser) {
-        setupBrowser(browser);
-
+    void goToPersonalAccountAfterLogin() {
         // Кликаем "Личный кабинет"
         mainPage.goToProfile();
 
@@ -55,12 +51,9 @@ public class AccountNavigationTest extends TestsBase {
         profilePage.shouldBeLoaded();
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"chrome", "yandex"})
+    @Test
     @DisplayName("Переход в Конструктор из Личного кабинета")
-    void goToConstructorFromPersonalAccount(String browser) {
-        setupBrowser(browser);
-
+    void goToConstructorFromPersonalAccount() {
         //Идем в ЛК
         mainPage.goToProfile();
         webdriver().shouldHave(urlContaining("account"));
@@ -74,11 +67,9 @@ public class AccountNavigationTest extends TestsBase {
         System.out.println("Текст активного таба: " + mainPage.isTabActive("Булки"));
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"chrome", "yandex"})
+    @Test
     @DisplayName("Переход по логотипу из Личного кабинета")
-    void goToMainPageViaLogo(String browser) {
-        setupBrowser(browser);
+    void goToMainPageViaLogo() {
 
         mainPage.goToProfile();
 
@@ -90,12 +81,9 @@ public class AccountNavigationTest extends TestsBase {
         System.out.println("Текст активного таба: " + mainPage.isTabActive("Булки"));
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"chrome", "yandex"})
+    @Test
     @DisplayName("Выход из аккаунта")
-    void logout(String browser) {
-        setupBrowser(browser);
-
+    void logout() {
         //Идем в ЛК
         mainPage.goToProfile();
 

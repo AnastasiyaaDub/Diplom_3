@@ -19,17 +19,6 @@ public class TestsBase {
         Configuration.timeout = 10000;
 
     }
-    protected void setupBrowser(String browser) {
-        if ("yandex".equals(browser)) {
-            // Путь к драйверу Яндекса
-            System.setProperty("webdriver.chrome.driver", "yandexdriver.exe");
-            setupYandexBrowser();
-        } else {
-            // Обычный Chrome
-            Configuration.browser = "chrome";
-            Configuration.timeout = 10000;
-        }
-    }
 
 
     @BeforeEach
@@ -39,6 +28,9 @@ public class TestsBase {
         // Настройка Яндекс.Браузера
         if ("yandex".equals(browser)) {
             setupYandexBrowser();
+        } else {
+            // Настройки для обычного Chrome (если нужно что-то специфическое)
+            Configuration.browser = "chrome";
         }
 
         //Закрытие попапов (если браузер уже запущен)
