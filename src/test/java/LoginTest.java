@@ -14,6 +14,7 @@ public class LoginTest extends TestsBase {
 
     private LoginPage loginPage;
     private MainPage mainPage;
+    private ProfilePage profilePage;
 
     @BeforeEach
     @Override
@@ -24,6 +25,7 @@ public class LoginTest extends TestsBase {
 
         loginPage = new LoginPage();
         mainPage = new MainPage();
+        profilePage = new ProfilePage();
 
         // Открываем браузер
         open(BaseElements.BASE_URL);
@@ -49,6 +51,7 @@ public class LoginTest extends TestsBase {
 
         //Можно проверить переход в личный кабинет
         mainPage.goToProfile();
+        profilePage.shouldBeLoaded();
     }
 
     @Test
@@ -67,6 +70,7 @@ public class LoginTest extends TestsBase {
 
         //Проверяем успешный вход - переход в ЛК
         mainPage.goToProfile();
+        profilePage.shouldBeLoaded();
     }
 
     @Test
@@ -91,6 +95,7 @@ public class LoginTest extends TestsBase {
 
         //Проверяем успешный вход
         mainPage.goToProfile();
+        profilePage.shouldBeLoaded();
     }
 
     @Test
@@ -112,6 +117,7 @@ public class LoginTest extends TestsBase {
 
         //Проверяем успешный вход
         mainPage.goToProfile();
+        profilePage.shouldBeLoaded();
     }
 
 }
