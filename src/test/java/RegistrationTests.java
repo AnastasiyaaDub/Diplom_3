@@ -1,8 +1,5 @@
-import config.BaseElements;
 import config.TestsBase;
 import data.UserUI;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,20 +11,17 @@ import static com.codeborne.selenide.Selectors.byClassName;
 import static com.codeborne.selenide.Selectors.withText;
 import static com.codeborne.selenide.Selenide.*;
 import static config.BaseElements.REGISTER_UI;
-import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class RegistrationTests extends TestsBase {
-    private UserUI createdUser;
-
 
     @BeforeEach
+    @Override
     public void setUp() {
         super.setUp();
         open(REGISTER_UI);
 
-        createdUser = null;
     }
 
     @Test
@@ -100,37 +94,4 @@ public class RegistrationTests extends TestsBase {
                 "Ошибка пароля должна отображаться");
     }
 
-    @AfterEach
-    void tearDown() {
-        // Удаляем пользователя, если он был создан
-        if (createdUser != null && createdUser.getPassword() != null
-                && createdUser.getPassword().length() >= 6) {
-            try {
-                String token = given()
-                        .contentType(ContentType.JSON)
-                        .body(createdUser)  // если UserUI сериализуется корректно
-                        .when()
-                        .post(BaseElements.LOGIN)
-                        .then()
-                        .statusCode(200)
-                        .extract()
-                        .path("accessToken");
-
-                // Если есть токен - удаляем
-                if (token != null) {
-                    given()
-                            .header("Authorization", token)
-                            .when()
-                            .delete(BaseElements.USER)
-                            .then()
-                            .statusCode(202);
-                    System.out.println("Удален пользователь: " + createdUser.getEmail());
-                }
-            } catch (Exception e) {
-                System.err.println("Не удалось удалить пользователя: " + e.getMessage());
-            }
-
-
-        }
-    }
 }

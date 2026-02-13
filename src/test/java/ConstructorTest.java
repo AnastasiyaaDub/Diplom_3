@@ -14,7 +14,9 @@ public class ConstructorTest extends TestsBase {
 
 
     @BeforeEach
+    @Override
     public void setUp() {
+        super.setUp();
         mainPage = new MainPage();
         open(BaseElements.BASE_URL);
 

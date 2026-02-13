@@ -2,6 +2,7 @@ package config;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.WebDriverRunner;
+import data.UserUI;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,8 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 import static com.codeborne.selenide.Selenide.*;
 import static java.util.Arrays.asList;
+import data.UserApi;
 
 public class TestsBase {
+    protected UserUI createdUser;
 
     @BeforeAll
     static void setupAll() {
@@ -36,8 +39,11 @@ public class TestsBase {
         //Закрытие попапов (если браузер уже запущен)
         if (WebDriverRunner.hasWebDriverStarted()) {
             closePopupsForYandex();
+
+            createdUser = null;
         }
     }
+
 
     private void setupYandexBrowser() {
         System.setProperty("webdriver.chrome.driver", "yandexdriver.exe");
@@ -91,6 +97,7 @@ public class TestsBase {
 
     @AfterEach
     void tearDown() {
+        UserApi.deleteUser(createdUser);
         // Закрываем браузер после каждого теста
         closeWebDriver();
     }

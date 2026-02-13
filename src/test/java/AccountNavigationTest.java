@@ -17,24 +17,26 @@ import static com.codeborne.selenide.WebDriverConditions.urlContaining;
 
 public class AccountNavigationTest extends TestsBase {
 
-    private UserUI testUser;
     private MainPage mainPage;
     private ProfilePage profilePage;
 
 
     @BeforeEach
+    @Override
     public void setUp() {
+        super.setUp();
         //Создаем пользователя через API
-        testUser = UserApi.createUserForUITest();
-        open(BaseElements.BASE_URL);
+        createdUser = UserApi.createUserForUITest();
 
-        LoginPage loginPage = new LoginPage();
         mainPage = new MainPage();
         profilePage = new ProfilePage();
 
+        open(BaseElements.BASE_URL);
 
         mainPage.goToProfile();
-        loginPage.login(testUser.getEmail(), testUser.getPassword());
+        LoginPage loginPage = new LoginPage();
+        loginPage.login(createdUser.getEmail(), createdUser.getPassword());
+
         actions().sendKeys(Keys.ESCAPE).perform();
         webdriver().shouldHave(urlContaining("/"));
     }
@@ -94,10 +96,4 @@ public class AccountNavigationTest extends TestsBase {
         webdriver().shouldHave(urlContaining("login"), Duration.ofSeconds(5));
     }
 
-    @AfterEach
-    void tearDown() {
-        if (testUser != null && testUser.hasAccessToken()) {
-            UserApi.deleteUser(testUser);
-        }
-    }
 }

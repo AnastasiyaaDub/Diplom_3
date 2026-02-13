@@ -13,65 +13,73 @@ public class UserApi {
 
 
     public static UserUI createUserForUITest() {
-        try {
-            String timestamp = String.valueOf(System.currentTimeMillis());
-            String name = "Тест_" + timestamp;
-            String email = "test_" + timestamp + "@mail.com";
-            String password = "password" + timestamp.substring(0, 6); // минимум 6 символов
 
-            //Создаем объект пользователя
-            UserUI user = new UserUI(name, email, password);
+        UserUI user = UserUI.generateRandom();
 
-            //Отправляем запрос регистрации
-            Response response = given()
-                    .header("Content-type", "application/json")
-                    .body(Map.of(
-                            "email", user.getEmail(),
-                            "password", user.getPassword(),
-                            "name", user.getName()
-                    ))
-                    .when()
-                    .post(BaseElements.REGISTER);
+        //Отправляем запрос регистрации
+        Response response = given()
+                .header("Content-type", "application/json")
+                .body(Map.of(
+                        "email", user.getEmail(),
+                        "password", user.getPassword(),
+                        "name", user.getName()
+                ))
+                .when()
+                .post(BaseElements.REGISTER);
 
-            //Проверяем успешность
-            if (response.statusCode() == 200) {
-                String accessToken = response.jsonPath().getString("accessToken");
-                user.setAccessToken(accessToken);
-                System.out.println("Создан пользователь: " + user.getEmail());
-                return user;
-            } else {
-                System.err.println("Ошибка создания пользователя. Код: " + response.statusCode());
-                return null;
-            }
-        } catch (Exception e) {
-            System.err.println("Исключение при создании пользователя: " + e.getMessage());
+        //Проверяем успешность
+        if (response.statusCode() == 200) {
+            String accessToken = response.jsonPath().getString("accessToken");
+            user.setAccessToken(accessToken);
+            System.out.println("API: Создан пользователь: " + user.getEmail());
+            return user;
+        } else {
+            System.err.println("API: Ошибка создания пользователя");
             return null;
         }
     }
 
-        public static void deleteUser (UserUI user){
-            if (user == null) {
-                System.out.println("Пользователь null, пропускаем удаление");
-                return;
-            }
 
-            if (user.getAccessToken() == null || user.getAccessToken().isEmpty()) {
-                System.out.println("У пользователя нет токена, пропускаем удаление: " + user.getEmail());
-                return;
-            }
+    public static void deleteUser(UserUI user) {
+        if (user == null) {
+            System.out.println("Пользователь null, пропускаем удаление");
+            return;
+        }
 
-            try {
-                given()
-                        .header("Authorization", user.getAccessToken())
+        try {
+            String token = user.getAccessToken();
+
+            if (token == null || token.isEmpty()) {
+                System.out.println("API: Токен отсутствует, пробуем логин для удаления...");
+
+                Response loginResp = given()
+                        .header("Content-type", "application/json")
+                        .body(Map.of(
+                                "email", user.getEmail(),
+                                "password", user.getPassword()
+                        ))
                         .when()
-                        .delete(BaseElements.USER)
-                        .then()
-                        .statusCode(202); // или 200
-                System.out.println("Удален пользователь: " + user.getEmail());
-            } catch (Exception e) {
-                System.err.println("Ошибка удаления пользователя " + user.getEmail() + ": " + e.getMessage());
+                        .post(BaseElements.LOGIN);
+                if (loginResp.statusCode() == 200) {
+                    token = loginResp.jsonPath().getString("accessToken");
+                } else {
+                    System.out.println("API: Логин не удался, значит пользователь не существует или неверный пароль.");
+                    return;
+                }
             }
+
+            given()
+                    .header("Authorization", token)
+                    .when()
+                    .delete(BaseElements.USER)
+                    .then()
+                    .statusCode(202); // или 200
+            System.out.println("API: Удален пользователь " + user.getEmail());
+        } catch (Exception e) {
+            System.err.println("API: Ошибка удаления пользователя " + e.getMessage());
         }
     }
+}
+
 
 

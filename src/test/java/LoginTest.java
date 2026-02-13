@@ -1,8 +1,7 @@
 import config.BaseElements;
 import config.TestsBase;
 import data.UserApi;
-import data.UserUI;
-import org.junit.jupiter.api.AfterEach;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,14 +14,15 @@ import static com.codeborne.selenide.WebDriverConditions.urlContaining;
 
 public class LoginTest extends TestsBase {
 
-    private UserUI testUser;
     private LoginPage loginPage;
     private MainPage mainPage;
 
     @BeforeEach
+    @Override
     public void setUp() {
+        super.setUp();
         // Предусловие: создаем пользователя через API
-        testUser = UserApi.createUserForUITest();
+        createdUser = UserApi.createUserForUITest();
 
         loginPage = new LoginPage();
         mainPage = new MainPage();
@@ -43,7 +43,7 @@ public class LoginTest extends TestsBase {
         $("h2").shouldHave(text("Вход"));
 
         //Заполняем форму логина
-        loginPage.login(testUser.getEmail(), testUser.getPassword());
+        loginPage.login(createdUser.getEmail(), createdUser.getPassword());
         actions().sendKeys(Keys.ESCAPE).perform();
 
         //Ожидаем успешного входа (редирект на главную)
@@ -64,7 +64,7 @@ public class LoginTest extends TestsBase {
         $("h2").shouldHave(text("Вход"));
 
         //Логинимся через LoginPage
-        loginPage.login(testUser.getEmail(), testUser.getPassword());
+        loginPage.login(createdUser.getEmail(), createdUser.getPassword());
         actions().sendKeys(Keys.ESCAPE).perform();
 
         //Проверяем успешный вход - переход в ЛК
@@ -88,7 +88,7 @@ public class LoginTest extends TestsBase {
        webdriver().shouldHave(urlContaining("login"), Duration.ofSeconds(5));
 
         //Логинимся
-        loginPage.login(testUser.getEmail(), testUser.getPassword());
+        loginPage.login(createdUser.getEmail(), createdUser.getPassword());
         actions().sendKeys(Keys.ESCAPE).perform();
 
         //Проверяем успешный вход
@@ -109,18 +109,11 @@ public class LoginTest extends TestsBase {
         forgotPasswordPage.clickLoginLink();
 
         //Логинимся
-        loginPage.login(testUser.getEmail(), testUser.getPassword());
+        loginPage.login(createdUser.getEmail(), createdUser.getPassword());
         actions().sendKeys(Keys.ESCAPE).perform();
 
         //Проверяем успешный вход
         mainPage.goToProfile();
     }
 
-    @AfterEach
-    void tearDown() {
-        // Постусловие: удаляем пользователя
-        if (testUser != null && testUser.hasAccessToken()) {
-            UserApi.deleteUser(testUser);
-        }
-    }
 }
