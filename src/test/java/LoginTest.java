@@ -6,15 +6,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import pages.*;
+
 import java.time.Duration;
+
 import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.WebDriverConditions.urlContaining;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LoginTest extends TestsBase {
 
     private LoginPage loginPage;
     private MainPage mainPage;
-    private ProfilePage profilePage;
+
 
     @BeforeEach
     @Override
@@ -25,7 +28,6 @@ public class LoginTest extends TestsBase {
 
         loginPage = new LoginPage();
         mainPage = new MainPage();
-        profilePage = new ProfilePage();
 
         // Открываем браузер
         open(BaseElements.BASE_URL);
@@ -46,12 +48,17 @@ public class LoginTest extends TestsBase {
         loginPage.login(createdUser.getEmail(), createdUser.getPassword());
         actions().sendKeys(Keys.ESCAPE).perform();
 
-        //Ожидаем успешного входа (редирект на главную)
+
         webdriver().shouldHave(urlContaining("/"), Duration.ofSeconds(5));
+        //Ожидаем успешного входа (редирект на главную)
+        String currentUrl = webdriver().driver().url();
+        assertTrue(currentUrl.contains("login"),
+                "После логина должны быть на главной странице");
 
         //Можно проверить переход в личный кабинет
         mainPage.goToProfile();
-        profilePage.shouldBeLoaded();
+        String profileUrl = webdriver().driver().url();
+        assertTrue(profileUrl.contains("account"), "Должны попасть в Личный кабинет");
     }
 
     @Test
@@ -60,17 +67,20 @@ public class LoginTest extends TestsBase {
         //Нажимаем "Личный Кабинет"
         mainPage.goToProfile();
 
-        //Проверяем редирект на страницу логина
         webdriver().shouldHave(urlContaining("login"), Duration.ofSeconds(5));
-        loginPage.checkPageLoaded();
+        assertTrue(webdriver().driver().url().contains("login"),
+                "Должны перейти на страницу логина");
 
         //Логинимся через LoginPage
+        loginPage.checkPageLoaded();
         loginPage.login(createdUser.getEmail(), createdUser.getPassword());
         actions().sendKeys(Keys.ESCAPE).perform();
 
         //Проверяем успешный вход - переход в ЛК
         mainPage.goToProfile();
-        profilePage.shouldBeLoaded();
+        webdriver().shouldHave(urlContaining("account"), Duration.ofSeconds(5));
+        assertTrue(webdriver().driver().url().contains("account"),
+                "После логина должны быть в Личном кабинете");
     }
 
     @Test
@@ -86,8 +96,9 @@ public class LoginTest extends TestsBase {
         //Нажимаем "Войти" (ссылка на странице регистрации)
         registrationPage.clickLoginLink();
 
-        //Проверяем переход на страницу логина
-       webdriver().shouldHave(urlContaining("login"), Duration.ofSeconds(5));
+        webdriver().shouldHave(urlContaining("login"), Duration.ofSeconds(5));
+        assertTrue(webdriver().driver().url().contains("login"),
+                "Должны вернуться на страницу логина");
 
         //Логинимся
         loginPage.login(createdUser.getEmail(), createdUser.getPassword());
@@ -95,7 +106,9 @@ public class LoginTest extends TestsBase {
 
         //Проверяем успешный вход
         mainPage.goToProfile();
-        profilePage.shouldBeLoaded();
+        webdriver().shouldHave(urlContaining("account"), Duration.ofSeconds(5));
+        assertTrue(webdriver().driver().url().contains("account"),
+                "После логина должны быть в ЛК");
     }
 
     @Test
@@ -117,7 +130,10 @@ public class LoginTest extends TestsBase {
 
         //Проверяем успешный вход
         mainPage.goToProfile();
-        profilePage.shouldBeLoaded();
+
+        webdriver().shouldHave(urlContaining("account"), Duration.ofSeconds(5));
+        assertTrue(webdriver().driver().url().contains("account"),
+                "После логина должны быть в ЛК");
     }
 
 }

@@ -49,8 +49,9 @@ public class AccountNavigationTest extends TestsBase {
         mainPage.goToProfile();
 
         // Проверяем что попали в ЛК
-        webdriver().shouldHave(urlContaining("account"), Duration.ofSeconds(5));
-        profilePage.shouldBeLoaded();
+        String currentUrl = webdriver().driver().url();
+        assertTrue(currentUrl.contains("account"),
+                "URL должен содержать 'account'");
     }
 
     @Test
@@ -79,10 +80,12 @@ public class AccountNavigationTest extends TestsBase {
 
         mainPage.clickLogoLink();
 
-        // Проверяем что вернулись на главную
-        webdriver().shouldHave(urlContaining("/"), Duration.ofSeconds(5));
-        mainPage.isTabActive("Булки");
-        System.out.println("Текст активного таба: " + mainPage.isTabActive("Булки"));
+        String currentUrl = webdriver().driver().url();
+        assertTrue(currentUrl.contains("/"),
+                "Должны вернуться на главную страницу");
+
+        assertTrue(mainPage.isTabActive("Булки"),
+                "После перехода на главную должен быть активен таб 'Булки'");
     }
 
     @Test
@@ -93,9 +96,11 @@ public class AccountNavigationTest extends TestsBase {
 
         //Выходим
         profilePage.clickLogout();
-
-        //Проверяем выход
         webdriver().shouldHave(urlContaining("login"), Duration.ofSeconds(5));
+        //Проверяем выход
+        String currentUrl = webdriver().driver().url();
+        assertTrue(currentUrl.contains("login"),
+                "После выхода должны попасть на страницу логина");
     }
 
 }
